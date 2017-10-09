@@ -1,0 +1,96 @@
+<ion-header>
+    <ion-navbar>
+        <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+        <ion-title>{{pageTitle}}
+            <div style="font-size: 0.6em; font:small-caption">{{updatedAt}}</div>
+        </ion-title>
+        <ion-buttons end (click)="showRadio()">
+            <button ion-button icon-only>
+        <ion-icon name="funnel"></ion-icon>
+      </button>
+        </ion-buttons>
+        <ion-buttons end (click)="showSearchBar()">
+            <button ion-button icon-only>
+        <ion-icon name="search"></ion-icon>
+      </button>
+        </ion-buttons>
+    </ion-navbar>
+    <ion-toolbar *ngIf="headerFooterVisible" color="primary">
+        <ion-searchbar [(ngModel)]="searchTextValue" debounce=1000 placeholder="Search by Event, Bet, Coupon" (ionInput)="searchFixtures($event.target.value)">
+        </ion-searchbar>
+    </ion-toolbar>
+    <ion-grid style="padding-bottom: 0px; padding-top: 2px; background-color: #eee">
+        <ion-row class="border-bottom" style="font-size: 0.6em">
+            <ion-col class="col-1"></ion-col>
+            <ion-col class="col-2">Event</ion-col>
+            <ion-col class="col-2">When</ion-col>
+            <ion-col class="col-2">Bet</ion-col>
+            <ion-col class="col-2">Coupon</ion-col>
+            <ion-col class="col-1">B/L</ion-col>
+            <ion-col class="col-1">5%</ion-col>
+            <ion-col class="col-1">LC</ion-col>
+            <ion-col class="col-1">Arb</ion-col>
+        </ion-row>
+    </ion-grid>
+</ion-header>
+
+<ion-content>
+    <ion-grid [ngClass]="paddingTop">
+        <ion-row class=" border-bottom" style="font-size: 0.6em;" *ngFor="let data of fixtures">
+            <ion-col class="col-1">
+                <ion-checkbox [(ngModel)]="data.isSelected" (click)="AddAccaList(data)">
+                </ion-checkbox>
+            </ion-col>
+            <ion-col class="col-2" style="color: #158cba; text-decoration: underline" (click)="UpdateOdds(data)">
+                {{data.eventName}}
+            </ion-col>
+            <ion-col class="col-2">{{data.when}}</ion-col>
+            <ion-col class="col-2" style="text-decoration: underline;color: #158cba " (click)="betFairLink(data)">{{data.marketDisplayName}}</ion-col>
+            <ion-col class="col-2" (click)="selectRow(data)" style="color:#158cba;">
+                {{data.coupon}}
+            </ion-col>
+            <ion-col class="col-1" [innerHTML]="data.BL"> </ion-col>
+            <ion-col class="col-1" [innerHTML]="data.fivePercent"></ion-col>
+            <ion-col class="col-1" [innerHTML]="data.LC"></ion-col>
+            <ion-col class="col-1" style="color: green " [innerHTML]="data.Arb">
+            </ion-col>
+        </ion-row>
+    </ion-grid>
+</ion-content>
+<ng-container>
+    <ion-footer style="background-color: #eee">
+        <ion-row style="height: 30px;padding-left: 2%; font-size: 0.7em;">
+            <ion-col class="col-summary-1">
+                {{(counter-1) * pageLimit + 1}} to {{counter * pageLimit > totalRecords ? totalRecords : counter * pageLimit }} of {{totalRecords}} entries {{totalSummaryText}}
+            </ion-col>
+            <ion-col class="col-summary-2">
+                <button class="button-small" [disabled]="accaFixtures.length == 0" (click)="clearAccaPage()" color="secondary" ion-button outline item-end icon-left>
+                      Clear
+                  </button>
+                <button class="button-small" [disabled]="accaFixtures.length == 0" (click)="goToAccaPage()" color="secondary" ion-button outline item-end icon-left>
+      Create ACCA
+      <span style="padding-left: 5% !important;">
+           <ion-badge class="ion-badge-custom" color="secondary">{{accaFixtures.length}}</ion-badge>
+      </span>
+    </button>
+            </ion-col>
+        </ion-row>
+
+        <ion-segment [(ngModel)]="pageIndex" color="secondary" style="padding-top: 5px;padding-bottom: 5px;padding-left: 10px;padding-right: 10px;">
+            <ion-segment-button style="font-size: 0.7em; " [disabled]="isPreviousDisabled " (click)="goToPrevious( 'Previous') " value="Previous">
+                Previous
+            </ion-segment-button>
+
+            <ng-container *ngFor="let page of pagination ">
+                <ion-segment-button *ngIf="page.isVisible " (click)="goToPage(page.id) " value={{page.id}}>
+                    {{page.id}}
+                </ion-segment-button>
+            </ng-container>
+            <ion-segment-button style="font-size: 0.7em; " [disabled]="isNextDisabled " (click)="goToNext('Next') " value="Next ">
+                Next
+            </ion-segment-button>
+        </ion-segment>
+    </ion-footer>
+</ng-container>
